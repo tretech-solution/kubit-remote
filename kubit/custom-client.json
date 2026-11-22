@@ -1,5 +1,7 @@
 {
   "app-name": "KuBIT-Remote",
+  "disable-account": "Y",
+  "disable-ab": "Y",
   "override-settings": {
     "custom-rendezvous-server": "assist.kubiterp.com",
     "relay-server": "assist.kubiterp.com",
