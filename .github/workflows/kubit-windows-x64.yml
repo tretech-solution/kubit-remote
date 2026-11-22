@@ -173,8 +173,8 @@ jobs:
         run: |
           pushd ./res/msi
           $arp = @{
-            Contact  = @{ msi = 'ARPCONTACT';  v = 'https://kubiterp.com' }
-            HelpLink = @{ msi = 'ARPHELPLINK'; v = 'https://kubiterp.com' }
+            Contact  = @{ msi = 'ARPCONTACT';  v = 'https://kubit-ks.com' }
+            HelpLink = @{ msi = 'ARPHELPLINK'; v = 'https://kubit-ks.com' }
             ReadMe   = @{ msi = 'ARPREADME';   v = 'https://github.com/tretech-solution/kubit-remote' }
           } | ConvertTo-Json -Compress
           python preprocess.py --arp -d ../../rustdesk --app-name $env:APP_NAME -m KuBIT --custom-arp $arp
