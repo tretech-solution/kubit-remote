@@ -2506,7 +2506,22 @@ pub fn rustdesk_interval(i: Interval) -> ThrottledInterval {
     ThrottledInterval::new(i)
 }
 
+/// KuBIT Remote: the custom-client configuration (name, server, key, policies) is compiled into
+/// the binary from `kubit/custom-client.json`, so it needs no signed `custom.txt` next to the exe
+/// and cannot be replaced on the customer's PC. The binary itself is code-signed by KuBIT.
+const KUBIT_CUSTOM_CLIENT: &str = include_str!("../kubit/custom-client.json");
+
 pub fn load_custom_client() {
+    match serde_json::from_str::<std::collections::HashMap<String, serde_json::Value>>(
+        KUBIT_CUSTOM_CLIENT,
+    ) {
+        Ok(data) => apply_custom_client(data),
+        Err(e) => log::error!("Invalid built-in KuBIT client config: {}", e),
+    }
+}
+
+#[allow(dead_code)]
+fn load_custom_client_file() {
     #[cfg(debug_assertions)]
     if let Ok(data) = std::fs::read_to_string("./custom.txt") {
         read_custom_client(data.trim());
@@ -2618,13 +2633,16 @@ pub fn read_custom_client(config: &str) {
         log::error!("Failed to dec custom client config");
         return;
     };
-    let Ok(mut data) =
+    let Ok(data) =
         serde_json::from_slice::<std::collections::HashMap<String, serde_json::Value>>(&data)
     else {
         log::error!("Failed to parse custom client config");
         return;
     };
+    apply_custom_client(data);
+}
 
+fn apply_custom_client(mut data: std::collections::HashMap<String, serde_json::Value>) {
     if let Some(app_name) = data.remove("app-name") {
         if let Some(app_name) = app_name.as_str() {
             *config::APP_NAME.write().unwrap() = app_name.to_owned();

@@ -1,0 +1,16 @@
+{
+  "app-name": "KuBIT-Remote",
+  "override-settings": {
+    "custom-rendezvous-server": "assist.kubiterp.com",
+    "relay-server": "assist.kubiterp.com",
+    "key": "eIrpQ8RZgDtmfbKqfHmj22F2EJn4blTHOZBKiYkIxUI=",
+    "enable-check-update": "N",
+    "allow-auto-update": "N",
+    "hide-server-settings": "Y",
+    "hide-powered-by-me": "Y"
+  },
+  "default-settings": {
+    "verification-method": "use-both-passwords",
+    "approve-mode": "password"
+  }
+}
