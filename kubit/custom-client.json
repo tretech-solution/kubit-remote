@@ -1,10 +1,9 @@
 {
   "app-name": "KuBIT-Remote",
-  "disable-account": "Y",
-  "disable-ab": "Y",
   "override-settings": {
     "custom-rendezvous-server": "assist.kubiterp.com",
     "relay-server": "assist.kubiterp.com",
+    "api-server": "https://assist.kubiterp.com/remote-api",
     "key": "eIrpQ8RZgDtmfbKqfHmj22F2EJn4blTHOZBKiYkIxUI=",
     "enable-check-update": "N",
     "allow-auto-update": "N",
