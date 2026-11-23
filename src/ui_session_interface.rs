@@ -1977,7 +1977,11 @@ pub async fn io_loop<T: InvokeUiSession>(handler: Session<T>, round: u32) {
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     let (sender, mut receiver) = mpsc::unbounded_channel::<Data>();
     *handler.sender.write().unwrap() = Some(sender.clone());
-    let token = LocalConfig::get_option("access_token");
+    // KuBIT: never send the KuBIT Assist API token to the ID / relay server. Only the RustDesk Pro server reads it there,
+    // and a non-empty token makes the client first demand an encrypted exchange that the OSS hbbs we run does not
+    // answer ("Failed to secure tcp: deadline has elapsed" for every signed-in staff member). Without that exchange the
+    // token would travel in clear text. Sign-in, address book and audit use the API server, not this token.
+    let token = String::new();
     let key = crate::get_key(false).await;
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     if handler.is_port_forward() {
