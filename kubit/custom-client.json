@@ -12,6 +12,7 @@
   },
   "default-settings": {
     "verification-method": "use-both-passwords",
-    "approve-mode": "password"
+    "approve-mode": "password",
+    "lock-after-session-end": "Y"
   }
 }
