@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import '../../common.dart';
 import '../../common/formatter/id_formatter.dart';
 import '../../models/peer_model.dart';
 import '../../models/platform_model.dart';
+import '../../utils/http_service.dart' as http;
 import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;
 import '../../desktop/widgets/popup_menu.dart';
 import 'dart:math' as math;
@@ -1564,6 +1566,34 @@ class TagPainter extends CustomPainter {
   }
 }
 
+/// KuBIT (Phase 20): shared address-book PCs with this tag have KuBIT Host — their password changes every session,
+/// so KuBIT Remote asks KuBIT Assist for this session's password (audited there) instead of using a saved one.
+const String kKubitHostTag = 'KuBIT Host';
+
+Future<String?> _kubitManagedConnectPassword(String peerId) async {
+  try {
+    final api = "${await bind.mainGetApiServer()}/api/kubit/managed-connect";
+    final headers = getHttpHeaders();
+    headers['Content-Type'] = 'application/json';
+    final resp = await http.post(Uri.parse(api),
+        headers: headers, body: jsonEncode({'peerId': peerId}));
+    final json = jsonDecode(decode_http_response(resp));
+    if (json is Map) {
+      final password = json['password'];
+      if (password is String && password.isNotEmpty) {
+        return password;
+      }
+      final error = json['error'];
+      if (error is String && error.isNotEmpty) {
+        showToast(error);
+      }
+    }
+  } catch (e) {
+    debugPrint('KuBIT managed-connect failed: $e');
+  }
+  return null;
+}
+
 void connectInPeerTab(BuildContext context, Peer peer, PeerTabIndex tab,
     {bool isFileTransfer = false,
     bool isViewCamera = false,
@@ -1584,7 +1614,15 @@ void connectInPeerTab(BuildContext context, Peer peer, PeerTabIndex tab,
       );
     }
     if (!gFFI.abModel.current.isPersonal()) {
-      if (peer.password.isNotEmpty) {
+      // KuBIT: a KuBIT Host PC gets this session's password from KuBIT Assist (falls back to the prompt on failure).
+      if (peer.tags.contains(kKubitHostTag)) {
+        final managed = await _kubitManagedConnectPassword(peer.id);
+        if (managed != null) {
+          password = managed;
+          isSharedPassword = true;
+        }
+      }
+      if (password.isEmpty && peer.password.isNotEmpty) {
         password = peer.password;
         isSharedPassword = true;
       }
