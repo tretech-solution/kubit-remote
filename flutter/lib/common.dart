@@ -4118,6 +4118,21 @@ void checkUpdate() {
       Timer(const Duration(seconds: 1), () async {
         bind.mainGetSoftwareUpdateUrl();
       });
+    } else if (isDesktop) {
+      // KuBIT: the Rust side asks KuBIT Assist for the newest KuBIT Remote, at start and every 6 hours.
+      platformFFI.registerEventHandler(
+          kCheckSoftwareUpdateFinish, kCheckSoftwareUpdateFinish,
+          (Map<String, dynamic> evt) async {
+        if (evt['version'] is String) {
+          stateGlobal.updateVersion.value = evt['version'];
+        }
+        if (evt['url'] is String) {
+          stateGlobal.updateUrl.value = evt['url'];
+        }
+      });
+      Timer(const Duration(seconds: 5), () => bind.mainGetSoftwareUpdateUrl());
+      Timer.periodic(
+          const Duration(hours: 6), (_) => bind.mainGetSoftwareUpdateUrl());
     }
   }
 }

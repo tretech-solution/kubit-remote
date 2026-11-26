@@ -41,6 +41,8 @@ jobs:
     env:
       TARGET: x86_64-pc-windows-msvc
       VCPKG_TRIPLET: x64-windows-static
+      # Compiled into the app (option_env!) so it knows its build: 1.5.3 + build 9 = "1.5.3.9" for the update check.
+      KUBIT_BUILD: ${{ github.run_number }}
     steps:
       - name: Export GitHub Actions cache environment variables
         uses: actions/github-script@d7906e4ad0b1822421a7e6a35d5ca353c962f410 # v6

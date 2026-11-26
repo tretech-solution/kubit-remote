@@ -1059,6 +1059,8 @@ pub fn is_modifier(evt: &KeyEvent) -> bool {
 
 pub fn check_software_update() {
     if is_custom_client() {
+        // KuBIT: the upstream check would offer stock RustDesk; ask KuBIT Assist instead.
+        std::thread::spawn(move || allow_err!(kubit_check_software_update()));
         return;
     }
     let opt = LocalConfig::get_option(keys::OPTION_ENABLE_CHECK_UPDATE);
@@ -1220,6 +1222,79 @@ pub async fn do_check_software_update() -> hbb_common::ResultType<()> {
         clear_software_update_url();
     }
     result
+}
+
+/// KuBIT: version including the CI build number compiled in by the build workflow ("1.5.3" + build 9 = "1.5.3.9").
+pub fn kubit_full_version() -> String {
+    match option_env!("KUBIT_BUILD").map(str::trim) {
+        Some(build) if !build.is_empty() => format!("{}.{}", crate::VERSION, build),
+        _ => crate::VERSION.to_owned(),
+    }
+}
+
+/// KuBIT: dotted numeric versions, missing parts count as 0 ("1.5.3.9" > "1.5.3").
+pub(crate) fn kubit_is_newer(remote: &str, local: &str) -> bool {
+    let parts = |v: &str| v.split('.').map(|s| s.trim().parse::<u64>().unwrap_or(0)).collect::<Vec<_>>();
+    let (remote, local) = (parts(remote), parts(local));
+    for i in 0..remote.len().max(local.len()) {
+        let (r, l) = (remote.get(i).copied().unwrap_or(0), local.get(i).copied().unwrap_or(0));
+        if r != l {
+            return r > l;
+        }
+    }
+    false
+}
+
+/// KuBIT: GET <api-server>/api/kubit/client-version -> { version, url } of the newest published KuBIT Remote MSI.
+/// A newer version sets the update URL to that public download link (the home page shows a Download card).
+#[tokio::main(flavor = "current_thread")]
+async fn kubit_check_software_update() -> ResultType<()> {
+    let api = crate::ui_interface::get_api_server();
+    if api.is_empty() {
+        clear_software_update_url();
+        return Ok(());
+    }
+    let url = format!("{api}/api/kubit/client-version");
+    let proxy_conf = Config::get_socks();
+    let tls_url = get_url_for_tls(&url, &proxy_conf);
+    let cached = get_cached_tls_type(tls_url);
+    let tls_type = cached.unwrap_or(TlsType::Rustls);
+    let response = match create_http_client_async(tls_type, false).get(&url).send().await {
+        Ok(resp) => (tls_type, resp),
+        Err(err) if cached.is_none() && err.is_request() => {
+            let resp = create_http_client_async(TlsType::NativeTls, false).get(&url).send().await?;
+            (TlsType::NativeTls, resp)
+        }
+        Err(err) => {
+            clear_software_update_url();
+            return Err(err.into());
+        }
+    };
+    upsert_tls_cache(tls_url, response.0, false);
+    let response = response.1;
+    if response.status().as_u16() == 204 || !response.status().is_success() {
+        clear_software_update_url();
+        return Ok(());
+    }
+    let body: serde_json::Value = serde_json::from_slice(&response.bytes().await?)?;
+    let version = body["version"].as_str().unwrap_or_default().to_owned();
+    let download = body["url"].as_str().unwrap_or_default().to_owned();
+    if !download.starts_with("https://") || !kubit_is_newer(&version, &kubit_full_version()) {
+        clear_software_update_url();
+        return Ok(());
+    }
+    #[cfg(feature = "flutter")]
+    {
+        let mut m = HashMap::new();
+        m.insert("name", "check_software_update_finish");
+        m.insert("url", &download);
+        m.insert("version", &version);
+        if let Ok(data) = serde_json::to_string(&m) {
+            let _ = crate::flutter::push_global_event(crate::flutter::APP_TYPE_MAIN, data);
+        }
+    }
+    *SOFTWARE_UPDATE_URL.lock().unwrap() = download;
+    Ok(())
 }
 
 #[inline]

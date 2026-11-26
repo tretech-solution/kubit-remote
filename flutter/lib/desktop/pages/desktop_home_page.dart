@@ -428,6 +428,17 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildHelpCards(String updateUrl) {
+    // KuBIT: newer KuBIT Remote published in KuBIT Assist -> download the MSI (installing it upgrades in place).
+    if (bind.isCustomClient() && updateUrl.isNotEmpty && !isCardClosed) {
+      final version = stateGlobal.updateVersion.value;
+      final suffix = version.isEmpty ? '' : ' ($version)';
+      return buildInstallCard(
+          "Status",
+          "Ka dalë versioni i ri i KuBIT Remote$suffix.\nA new version of KuBIT Remote is available$suffix.",
+          "Download", () async {
+        await launchUrl(Uri.parse(updateUrl));
+      }, closeButton: true);
+    }
     if (!bind.isCustomClient() &&
         updateUrl.isNotEmpty &&
         !isCardClosed &&

@@ -26,6 +26,8 @@ class StateGlobal {
   final isPortrait = false.obs;
 
   final updateUrl = ''.obs;
+  // KuBIT: version of the newer KuBIT Remote offered by KuBIT Assist.
+  final updateVersion = ''.obs;
 
   String _inputSource = '';
 
