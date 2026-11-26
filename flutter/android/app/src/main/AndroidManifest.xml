@@ -29,7 +29,7 @@
     <application
         android:name=".MainApplication"
         android:icon="@mipmap/ic_launcher"
-        android:label="RustDesk"
+        android:label="KuBIT Remote"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true">
 
@@ -49,7 +49,7 @@
             android:name=".InputService"
             android:enabled="true"
             android:exported="false"
-            android:label="RustDesk Input"
+            android:label="KuBIT Remote Input"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -79,7 +79,8 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="rustdesk" />
+                <!-- KuBIT: matches get_uri_prefix() (app name, lower case) -->
+                <data android:scheme="kubit-remote" />
             </intent-filter>
         </activity>
 

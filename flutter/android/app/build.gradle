@@ -99,7 +99,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.carriez.flutter_hbb"
+        // KuBIT: own ID so it installs next to stock RustDesk. Keep `namespace` (Kotlin package, JNI names) unchanged.
+        applicationId "com.tretechsolution.kubitremote"
         minSdkVersion 22
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
