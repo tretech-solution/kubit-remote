@@ -725,7 +725,7 @@ const kCheckSoftwareUpdateFinish = 'check_software_update_finish';
 
 // KuBIT Remote: links shown in the client (About page, installer).
 const String kKubitWebsiteUrl = 'https://tretechsolution.com';
-const String kKubitPrivacyUrl = 'https://kubit-ks.com';
+const String kKubitPrivacyUrl = 'https://assist.kubiterp.com/privacy';
 const String kKubitLicenceUrl =
     'https://github.com/tretech-solution/kubit-remote/blob/kubit/main/LICENCE';
 const String kKubitSourceUrl = 'https://github.com/tretech-solution/kubit-remote';
