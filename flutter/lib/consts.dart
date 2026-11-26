@@ -724,7 +724,7 @@ extension WindowsTargetExt on int {
 const kCheckSoftwareUpdateFinish = 'check_software_update_finish';
 
 // KuBIT Remote: links shown in the client (About page, installer).
-const String kKubitWebsiteUrl = 'https://kubit-ks.com';
+const String kKubitWebsiteUrl = 'https://tretechsolution.com';
 const String kKubitPrivacyUrl = 'https://kubit-ks.com';
 const String kKubitLicenceUrl =
     'https://github.com/tretech-solution/kubit-remote/blob/kubit/main/LICENCE';

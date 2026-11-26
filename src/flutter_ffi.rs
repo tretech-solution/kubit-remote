@@ -1159,7 +1159,8 @@ pub fn main_get_license() -> String {
 }
 
 pub fn main_get_version() -> String {
-    get_version()
+    // KuBIT: shown on the About page; includes the build number ("1.5.3.9").
+    crate::common::kubit_full_version()
 }
 
 pub fn main_get_fav() -> Vec<String> {
