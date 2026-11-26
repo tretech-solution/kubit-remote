@@ -2294,7 +2294,7 @@ class _AccountState extends State<_Account> {
     return Obx(() => _Button(
         gFFI.userModel.userName.value.isEmpty
             ? 'Login'
-            : '${translate('Logout')} (${gFFI.userModel.accountLabelWithHandle})',
+            : translate('Logout'),
         () => {
               gFFI.userModel.userName.value.isEmpty
                   ? loginDialog()
@@ -2333,7 +2333,10 @@ class _AccountState extends State<_Account> {
                         const SizedBox(height: 2),
                         SelectionArea(
                           child: Text(
-                            '@${gFFI.userModel.userName.value}',
+                            // KuBIT: user names are e-mail addresses; no "@" handle prefix.
+                            gFFI.userModel.userName.value.contains('@')
+                                ? gFFI.userModel.userName.value
+                                : '@${gFFI.userModel.userName.value}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(

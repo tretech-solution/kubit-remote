@@ -35,7 +35,8 @@ class UserModel {
     if (preferred.isEmpty || preferred == username) {
       return username;
     }
-    return '$preferred (@$username)';
+    // KuBIT: user names are e-mail addresses; no "@" handle prefix.
+    return username.contains('@') ? '$preferred ($username)' : '$preferred (@$username)';
   }
 
   WeakReference<FFI> parent;
