@@ -922,8 +922,8 @@ showInputWarnAlert(FFI ffi) {
         ],
       ),
       actions: [
-        dialogButton("Cancel", onPressed: close, isOutline: true),
-        dialogButton("Open System Setting", onPressed: submit),
+        dialogButton("Decline", onPressed: close, isOutline: true),
+        dialogButton("I agree, open settings", onPressed: submit),
       ],
       onSubmit: submit,
       onCancel: close,
